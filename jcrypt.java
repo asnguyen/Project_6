@@ -614,7 +614,7 @@ public class jcrypt
       return(buffer.toString());
    }
 
-   public static void main(String args[])
+   /*public static void main(String args[])
    {
       if(args.length != 2)
       {
@@ -630,5 +630,5 @@ public class jcrypt
             jcrypt.crypt(salt, password) + "]"
          );
       }
-   }
+   }*/
 }
