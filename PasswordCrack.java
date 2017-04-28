@@ -7,7 +7,6 @@ public class PasswordCrack
 	{
 		System.out.println("Program Start");
 		Scanner sc = null;
-		String[][] passwd_salt = new String[20][2];
 		Password[] passwords = new Password[20];
 		try
 		{
@@ -20,13 +19,11 @@ public class PasswordCrack
 		{
 			String[] temp = new String[2];
 			temp = extract(sc.nextLine());
-			passwd_salt[i][0] = temp[1];
-			passwd_salt[i][1] = temp[0];
-			passwords[i] = new Password(temp[1],temp[0]);
+			passwords[i] = new Password(temp[1],temp[0],temp[4]);
 		}
 		//dictionaryAttackSet(passwords,"wordlist.txt");
 		//dictionaryAttackSet(passwords,"wordlist2.txt");
-		dictionaryAttackSubtring2(passwords,"wordlist.txt");
+		dictionaryAttackName(passwords,"wordlist.txt");
 		//dictionaryAttackToggle1(passwords,"wordlist2.txt");
 		//dictionaryAttackToggle2(passwords,"wordlist2.txt");
 
@@ -384,10 +381,35 @@ public class PasswordCrack
 			}
 		}
 	}
+
+	public static void dictionaryAttackName(Password passwords[])
+	{
+		for(int i=0;i<20;++i)
+		{
+			String[] temp = passwords[i].user.split("\\s+");
+			String password = jcrypt.crypt(passwords[i].salt,temp[1];
+			if(!passwords[i].cracked)
+			{
+				if(password.equals(passwords[i].salt+passwords[i].passwd))
+				{
+					System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+temp[1]);
+					passwords[i].cracked = true;
+				}
+		    }
+
+		    password = jcrypt.crypt(passwords[i].salt,temp[0];
+			if(!passwords[i].cracked)
+			{
+				if(password.equals(passwords[i].salt+passwords[i].passwd))
+				{
+					System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+temp[0]);
+					passwords[i].cracked = true;
+				}
+		    }
+
+		}
+	}
 	
-
-
-
 	public static String[] extract(String line)
 	{
 		String[] _line = line.split(":");
