@@ -23,10 +23,55 @@ public class PasswordCrack
 
 		nameAttackSet(passwords);
 		dictAttack(passwords,"wordlist.txt");
+		bruteForce(passwords);
 
 		long endTime = System.currentTimeMillis() - start_time;
 		System.out.println(endTime);
 		System.out.println("Program End");
+	}
+
+	public static void bruteForce(Password passwords[])
+	{
+		//ascii range from 33-126 inclusive
+		char[] phrase = new char[8];
+		while(passwdLeft(passwords))
+		{
+			for(int i = 33;i<=126;++i)
+			{
+
+			}
+			String guess = new String(phrase);
+			compare(passwords,guess);
+		}
+		
+	}
+	/*
+	will be called like 
+	char[] pw = new char[8];
+	bruteForce()
+	*/
+
+	public static void bruteForce(char[] pw, int pos, Password password)
+	{
+		if(pos<0)
+		{
+			compare(password,new String(pw));
+		}
+		for(pw[pos]='!';pw[pos]<='~';pw[pos]++)
+		{
+			bruteForce(pw,pos-1);
+		}
+	}
+
+	public static boolean passwdLeft(Password passwords[])
+	{
+		for(int i=0;i<passwords.length;i++)
+		{
+			if(!passwords[i].cracked)
+				return true;
+		}
+
+		return false;
 	}
 
 	public static void dictAttack(Password passwords[], String file)
