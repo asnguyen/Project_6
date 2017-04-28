@@ -13,38 +13,23 @@ public class PasswordCrack
 			sc = new Scanner(new File(args[0]));
 		}
 		catch(Exception e){}
-		String[] salt_passwd = extract("michael:atQhiiJLsT6cs:500:500:Michael Ferris:/home/michael:/bin/bash");
 		long start_time = System.currentTimeMillis();
 		for(int i=0;i<20;++i)
 		{
-			String[] temp = new String[2];
+			String[] temp = new String[3];
 			temp = extract(sc.nextLine());
-			passwords[i] = new Password(temp[1],temp[0],temp[4]);
+			passwords[i] = new Password(temp[1],temp[0],temp[2]);
 		}
-		//dictionaryAttackSet(passwords,"wordlist.txt");
-		//dictionaryAttackSet(passwords,"wordlist2.txt");
-		dictionaryAttackName(passwords,"wordlist.txt");
-		//dictionaryAttackToggle1(passwords,"wordlist2.txt");
-		//dictionaryAttackToggle2(passwords,"wordlist2.txt");
+
+		nameAttackSet(passwords);
+		dictAttack(passwords,"wordlist.txt");
 
 		long endTime = System.currentTimeMillis() - start_time;
 		System.out.println(endTime);
 		System.out.println("Program End");
 	}
 
-	public static void dictionaryAttackSet(Password passwords[],String file)
-	{
-		dictionaryAttack(passwords,file);
-		dictionaryAttackUpperCase(passwords,file);
-		dictionaryAttackReverse(passwords,file);
-		dictionaryAttackReflect1(passwords,file);
-		dictionaryAttackReflect2(passwords,file);
-		dictionaryAttackCap(passwords,file);
-		dictionaryAttacknCap(passwords,file);
-		dictionaryAttackSubtring1(passwords,file);
-	}
-
-	public static void dictionaryAttackUpperCase(Password passwords[], String file)
+	public static void dictAttack(Password passwords[], String file)
 	{
 		Scanner sc = null;
 		try
@@ -52,371 +37,323 @@ public class PasswordCrack
 			sc = new Scanner(new File(file));
 		}
 		catch(Exception e){}
+		long start_time = System.currentTimeMillis();
 		while(sc.hasNextLine())
 		{
 			String phrase = sc.nextLine();
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,phrase.toUpperCase());
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+phrase.toUpperCase());
-						passwords[i].cracked = true;
-					}
-			    }
-			}
+			wordAttackSet(passwords,phrase,start_time);
 		}
 	}
 
-	public static void dictionaryAttack(Password passwords[], String file)
+	public static void wordAttackSet(Password passwords[], String phrase, long start_time)
 	{
-		Scanner sc = null;
-		try
+		for(int i=0;i<20;i++)
 		{
-			sc = new Scanner(new File(file));
-		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,phrase);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+phrase);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
+			
+			if(compare(passwords[i],phrase))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],phrase.toUpperCase()))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],phrase.toLowerCase()))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],reverse(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],reflect1(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],reflect2(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i], doublePhrase(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],cap(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],ncap(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],toggle1(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],toggle2(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],substring1(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],substring2(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			
+			if(compare(passwords[i],reverse(cap(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],reverse(ncap(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],reverse(doublePhrase(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+
+			if(compare(passwords[i],reverse(toggle1(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],reverse(toggle2(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],reverse(substring1(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],reverse(substring1(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+
+			if(compare(passwords[i],substring1(reverse(cap(phrase)))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],substring2(reverse(cap(phrase)))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+
+			if(compare(passwords[i],eSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],aSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],iSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],oSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],tSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+
+			if(compare(passwords[i],endChar(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(passwords[i],beginChar(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+
+
+			addNumerical(passwords[i], phrase, start_time);
+
+
+
 		}
 	}
 
-	public static void dictionaryAttackReverse(Password passwords[], String file)
+	public static void nameAttackSet(Password passwords[])
 	{
-		Scanner sc = null;
-		try
+		long start_time = System.currentTimeMillis();
+		for(int i = 0;i<20;++i)
 		{
-			sc = new Scanner(new File(file));
-		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			phrase = new StringBuffer(phrase).reverse().toString();
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,phrase);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+phrase);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
+
+			nameCompare(passwords[i],passwords[i].user,start_time);
+
+			String[] name = passwords[i].user.split("\\s+");
+			nameCompare(passwords[i],name[0],start_time);
+			nameCompare(passwords[i],name[1],start_time);
+			nameCompare(passwords[i],name[0]+name[1],start_time);
+
 		}
 	}
 
-	public static void dictionaryAttackDouble(Password passwords[], String file)
+	public static void nameCompare(Password password, String phrase, long start_time)
 	{
-		Scanner sc = null;
-		try
-		{
-			sc = new Scanner(new File(file));
-		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,phrase+phrase);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+phrase+phrase);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
-		}
+			if(compare(password,phrase))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,phrase.toUpperCase()))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,phrase.toLowerCase()))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,reverse(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,reflect1(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,reflect2(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password, doublePhrase(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,cap(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,ncap(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,toggle1(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,toggle2(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,substring1(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,substring2(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			
+			if(compare(password,reverse(cap(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,reverse(ncap(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,reverse(doublePhrase(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,reverse(toggle1(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,reverse(toggle2(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,reverse(substring1(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,reverse(substring2(phrase))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,substring1(reverse(cap(phrase)))))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+
+			if(compare(password,eSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,aSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,iSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,oSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			if(compare(password,tSub(phrase)))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
+			addNumerical(password, phrase, start_time);
+
+
+
+
 	}
 
-	public static void dictionaryAttackReflect1(Password passwords[], String file)
+	public static String reverse(String s)
 	{
-		Scanner sc = null;
-		try
-		{
-			sc = new Scanner(new File(file));
-		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			String reflect = new StringBuffer(phrase).reverse().toString();
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,phrase+reflect);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+phrase+reflect);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
-		}
+		return new StringBuffer(s).reverse().toString();
 	}
-	public static void dictionaryAttackReflect2(Password passwords[], String file)
+
+	public static String reflect1(String s)
 	{
-		Scanner sc = null;
-		try
-		{
-			sc = new Scanner(new File(file));
-		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			String reflect = new StringBuffer(phrase).reverse().toString();
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,reflect+phrase);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+reflect+phrase);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
-		}
+		String reflect = new StringBuffer(s).reverse().toString();
+		return s+reflect;
 	}
 
-	public static void dictionaryAttackCap(Password passwords[], String file)
+	public static String reflect2(String s)
 	{
-		Scanner sc = null;
-		try
-		{
-			sc = new Scanner(new File(file));
-		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			String upper = phrase.toUpperCase();
-			phrase = upper.charAt(0)+phrase.substring(1);
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,phrase);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+phrase);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
-		}
+		String reflect = new StringBuffer(s).reverse().toString();
+		return reflect+s;
 	}
 
-	public static void dictionaryAttacknCap(Password passwords[], String file)
+	public static String doublePhrase(String s)
 	{
-		Scanner sc = null;
-		try
-		{
-			sc = new Scanner(new File(file));
-		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			String upper = phrase.toUpperCase();
-			phrase = phrase.charAt(0)+upper.substring(1);
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,phrase);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+phrase);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
-		}
+		//System.out.println(s+s);
+		String temp = s+s;
+		//System.out.println(temp);
+		return temp;
 	}
 
-	public static void dictionaryAttackToggle1(Password passwords[], String file)
+	public static String cap(String s)
 	{
-		Scanner sc = null;
-		try
-		{
-			sc = new Scanner(new File(file));
-		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			String upper = phrase.toUpperCase();
-			String temp = "";
-			for(int i = 0;i<phrase.length();++i)
-			{
-				if(i%2==0)
-					temp+=phrase.charAt(i);
-				else
-					temp+=upper.charAt(i);
-			}
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,temp);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+temp);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
-		}
+		String upper = s.toUpperCase();
+		String phrase = upper.charAt(0)+s.substring(1);
+		return phrase;
 	}
 
-	public static void dictionaryAttackToggle2(Password passwords[], String file)
+	public static String ncap(String s)
 	{
-		Scanner sc = null;
-		try
-		{
-			sc = new Scanner(new File(file));
-		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			String upper = phrase.toUpperCase();
-			String temp = "";
-			for(int i = 0;i<phrase.length();++i)
-			{
-				if(i%2!=0)
-					temp+=phrase.charAt(i);
-				else
-					temp+=upper.charAt(i);
-			}
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,temp);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+temp);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
-		}
+		String upper = s.toUpperCase();
+		String phrase = s.charAt(0)+upper.substring(1);
+		return phrase;
 	}
 
-	public static void dictionaryAttackSubtring1(Password passwords[], String file)
+	public static String toggle1(String phrase)
 	{
-		Scanner sc = null;
-		try
+		String upper = phrase.toUpperCase();
+		String temp = "";
+		for(int i = 0;i<phrase.length();++i)
 		{
-			sc = new Scanner(new File(file));
+			if(i%2==0)
+				temp+=phrase.charAt(i);
+			else
+				temp+=upper.charAt(i);
 		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
+		return temp;
+	}
+
+	public static String toggle2(String phrase)
+	{
+		String upper = phrase.toUpperCase();
+		String temp = "";
+		for(int i = 0;i<phrase.length();++i)
 		{
-			String phrase = sc.nextLine();
-			phrase = phrase.substring(1);
-			for(int i = 0;i<20;++i)
+			if(i%2==1)
+				temp+=phrase.charAt(i);
+			else
+				temp+=upper.charAt(i);
+		}
+		return temp;
+	}
+
+	public static String substring1(String phrase)
+	{
+		phrase = phrase.substring(1);
+		return phrase;
+	}
+
+	public static String substring2(String phrase)
+	{
+		phrase = phrase.substring(0,phrase.length()-1);
+		return phrase;
+	}
+
+	public static String eSub(String phrase)
+	{
+		phrase = phrase.replace("e","3");
+		return phrase;
+	}
+
+	public static String aSub(String phrase)
+	{
+		phrase = phrase.replace("a","@");
+		return phrase;
+	}
+
+	public static String iSub(String phrase)
+	{
+		phrase = phrase.replace("i","!");
+		return phrase;
+	}
+
+	public static String oSub(String phrase)
+	{
+		phrase = phrase.replace("o","0");
+		return phrase;
+	}
+
+	public static String tSub(String phrase)
+	{
+		phrase = phrase.replace("t","+");
+		return phrase;
+	}
+
+	public static String endChar(String phrase)
+	{
+		return phrase.charAt(phrase.length()-1)+phrase;
+	}
+
+	public static String beginChar(String phrase)
+	{
+		return phrase+(phrase.charAt(0));
+	}
+
+	public static boolean compare(Password passwd, String phrase)
+	{
+		String password = jcrypt.crypt(passwd.salt,phrase);
+		if(!passwd.cracked)
+		{
+			if(password.equals(passwd.salt+passwd.passwd))
 			{
-				String password = jcrypt.crypt(passwords[i].salt,phrase);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+phrase);
-						passwords[i].cracked = true;
-					}
-			    }
+				System.out.println("SALT: "+passwd.salt+" Password: "+passwd.passwd+" Cracked: "+phrase);
+				passwd.cracked = true;
+				return true;
 			}
 		}
+		return false;
+
 	}
 
-	public static void dictionaryAttackSubtring2(Password passwords[], String file)
+	public static void addNumerical(Password passwd, String phrase, long start_time)
 	{
-		Scanner sc = null;
-		try
+		for(int i=0;i<=9;++i)
 		{
-			sc = new Scanner(new File(file));
+			if(compare(passwd,phrase+i))
+				System.out.println("FOUND in "+(System.currentTimeMillis() - start_time)+" milliseconds");
 		}
-		catch(Exception e){}
-		while(sc.hasNextLine())
-		{
-			String phrase = sc.nextLine();
-			phrase = phrase.substring(0,phrase.length()-1);
-			for(int i = 0;i<20;++i)
-			{
-				String password = jcrypt.crypt(passwords[i].salt,phrase);
-				if(!passwords[i].cracked)
-				{
-					if(password.equals(passwords[i].salt+passwords[i].passwd))
-					{
-						System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+phrase);
-						passwords[i].cracked = true;
-					}
-			    }
-			}
-		}
+
 	}
 
-	public static void dictionaryAttackName(Password passwords[])
-	{
-		for(int i=0;i<20;++i)
-		{
-			String[] temp = passwords[i].user.split("\\s+");
-			String password = jcrypt.crypt(passwords[i].salt,temp[1];
-			if(!passwords[i].cracked)
-			{
-				if(password.equals(passwords[i].salt+passwords[i].passwd))
-				{
-					System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+temp[1]);
-					passwords[i].cracked = true;
-				}
-		    }
-
-		    password = jcrypt.crypt(passwords[i].salt,temp[0];
-			if(!passwords[i].cracked)
-			{
-				if(password.equals(passwords[i].salt+passwords[i].passwd))
-				{
-					System.out.println("SALT: "+passwords[i].salt+" Password: "+passwords[i].passwd+" Cracked: "+temp[0]);
-					passwords[i].cracked = true;
-				}
-		    }
-
-		}
-	}
-	
 	public static String[] extract(String line)
 	{
 		String[] _line = line.split(":");
-		String[] ret  = new String[2];
+		String[] ret  = new String[3];
 		String temp  = _line[1];
 		ret[0] = temp.substring(0,2);
-		ret[1]= temp.substring(2);
+		ret[1] = temp.substring(2);
+		ret[2] = _line[4];
 		return ret;
 	}
 
